@@ -62,11 +62,14 @@ import { AuthService } from '../../../core/services/auth.service';
     .sidenav { width: 220px; background: #1a1a2e; color: white; }
     .logo { padding: 24px 16px 16px; }
     .logo-text { font-size: 24px; font-weight: 700; color: #4fc3f7; letter-spacing: 1px; }
-    mat-nav-list a { color: #ccc; }
-    mat-nav-list a.active { background: rgba(79,195,247,0.15); color: #4fc3f7; }
-    mat-nav-list a:hover { background: rgba(255,255,255,0.05); }
     .main-content { background: #f5f7fa; padding: 0; }
-    ::ng-deep .mat-mdc-list-item .mat-icon { color: inherit; }
+    ::ng-deep .sidenav .mat-mdc-list-item { color: white !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item .mdc-list-item__primary-text { color: white !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item .mat-icon { color: white !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item.active .mdc-list-item__primary-text { color: #4fc3f7 !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item.active .mat-icon { color: #4fc3f7 !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item.active { background: rgba(79,195,247,0.15) !important; }
+    ::ng-deep .sidenav .mat-mdc-list-item:hover { background: rgba(255,255,255,0.08) !important; }
   `],
 })
 export class LayoutComponent {
