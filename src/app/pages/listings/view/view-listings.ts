@@ -114,7 +114,17 @@ import { ApiService } from '../../../core/services/api.service';
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
-        <div *ngIf="listings.length === 0" class="empty-state">
+        <div *ngIf="loading" class="empty-state">
+          <p>Loading listings...</p>
+        </div>
+
+        <div *ngIf="loadError" class="empty-state error-state">
+          <mat-icon>error_outline</mat-icon>
+          <p>{{ loadError }}</p>
+          <button mat-stroked-button (click)="load()">Retry</button>
+        </div>
+
+        <div *ngIf="!loading && !loadError && listings.length === 0" class="empty-state">
           <mat-icon>inventory_2</mat-icon>
           <p>No listings yet. <a routerLink="/add-listing">Add your first listing</a></p>
         </div>
@@ -141,6 +151,8 @@ import { ApiService } from '../../../core/services/api.service';
     .empty-state { padding: 48px; text-align: center; color: #999; }
     .empty-state mat-icon { font-size: 48px; height: 48px; width: 48px; }
     .empty-state a { color: #4fc3f7; }
+    .error-state { color: #c62828; }
+    .error-state mat-icon { color: #c62828; }
   `],
 })
 export class ViewListingsComponent implements OnInit {
@@ -149,14 +161,21 @@ export class ViewListingsComponent implements OnInit {
   displayedColumns = ['select', 'image', 'title', 'price', 'category', 'campaign', 'location', 'status', 'actions'];
   apiUrl = environment.apiUrl;
   posting: Record<string, boolean> = {};
+  loading = false;
+  loadError = '';
 
   constructor(private api: ApiService) {}
 
   ngOnInit() { this.load(); }
 
   load() {
+    this.loading = true;
+    this.loadError = '';
     const params = this.searchTerm ? `?search=${this.searchTerm}` : '';
-    this.api.get<any[]>(`/api/listings${params}`).subscribe(l => this.listings = l);
+    this.api.get<any[]>(`/api/listings${params}`).subscribe({
+      next: l => { this.listings = l; this.loading = false; },
+      error: () => { this.loadError = 'Could not load listings. Try refreshing.'; this.loading = false; },
+    });
   }
 
   onSearch() { this.load(); }
