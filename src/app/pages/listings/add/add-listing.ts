@@ -60,12 +60,15 @@ import { environment } from '../../../../environments/environment';
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Title</mat-label>
             <input matInput formControlName="title">
+            <mat-error *ngIf="form.get('title')?.hasError('required')">Title is required</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="price-field">
             <mat-label>Price</mat-label>
             <span matTextPrefix>$&nbsp;</span>
             <input matInput type="number" formControlName="price" min="0">
+            <mat-error *ngIf="form.get('price')?.hasError('required')">Price is required</mat-error>
+            <mat-error *ngIf="form.get('price')?.hasError('min')">Price must be 0 or more</mat-error>
           </mat-form-field>
 
           <div class="field-group">
@@ -143,10 +146,10 @@ import { environment } from '../../../../environments/environment';
           <p class="error" *ngIf="error">{{ error }}</p>
 
           <div class="actions">
-            <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid || loading">
+            <button mat-flat-button color="primary" type="submit" [disabled]="loading">
               {{ loading ? 'Saving...' : 'Save Listing' }}
             </button>
-            <button mat-stroked-button type="button" [disabled]="form.invalid || loading" (click)="saveAsTemplate()">
+            <button mat-stroked-button type="button" [disabled]="loading" (click)="saveAsTemplate()">
               Save as Template
             </button>
             <a mat-button routerLink="/listings">Cancel</a>
@@ -291,6 +294,7 @@ export class AddListingComponent implements OnInit {
   }
 
   submit() {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
     this.loading = true;
     this.error = '';
