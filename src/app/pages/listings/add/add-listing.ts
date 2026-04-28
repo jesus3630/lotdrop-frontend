@@ -95,6 +95,41 @@ import { environment } from '../../../../environments/environment';
             </mat-select>
           </mat-form-field>
 
+          <ng-container *ngIf="form.get('listingType')?.value === 'vehicle'">
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="year-field">
+                <mat-label>Year</mat-label>
+                <input matInput type="number" formControlName="year" placeholder="2020">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Make</mat-label>
+                <input matInput formControlName="make" placeholder="Toyota">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Model</mat-label>
+                <input matInput formControlName="model" placeholder="Camry">
+              </mat-form-field>
+            </div>
+            <div class="field-row">
+              <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Mileage</mat-label>
+                <input matInput type="number" formControlName="mileage" placeholder="45000">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Exterior Color</mat-label>
+                <input matInput formControlName="exteriorColor" placeholder="White">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="flex-field">
+                <mat-label>Transmission</mat-label>
+                <mat-select formControlName="transmission">
+                  <mat-option value="Automatic">Automatic</mat-option>
+                  <mat-option value="Manual">Manual</mat-option>
+                  <mat-option value="CVT">CVT</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Description</mat-label>
             <textarea matInput formControlName="description" rows="5"></textarea>
@@ -140,6 +175,10 @@ import { environment } from '../../../../environments/environment';
     .uploading-text { color: #666; font-size: 13px; margin: 4px 0; }
     .error { color: #e53935; font-size: 14px; }
     .actions { display: flex; gap: 12px; margin-top: 16px; }
+    .field-row { display: flex; gap: 12px; margin-bottom: 0; }
+    .field-row mat-form-field { margin-bottom: 8px; }
+    .year-field { width: 120px; flex-shrink: 0; }
+    .flex-field { flex: 1; min-width: 0; }
   `],
 })
 export class AddListingComponent implements OnInit {
@@ -169,6 +208,12 @@ export class AddListingComponent implements OnInit {
       condition: ['Used - Good'],
       description: [''],
       location: [''],
+      year: [null],
+      make: [''],
+      model: [''],
+      mileage: [null],
+      exteriorColor: [''],
+      transmission: ['Automatic'],
     });
   }
 
@@ -179,7 +224,16 @@ export class AddListingComponent implements OnInit {
     this.editId = this.route.snapshot.paramMap.get('id');
     if (this.editId) {
       this.api.get<any>(`/api/listings/${this.editId}`).subscribe(l => {
-        this.form.patchValue({ ...l, campaignId: l.campaign?.id || '' });
+        this.form.patchValue({
+          ...l,
+          campaignId: l.campaign?.id || '',
+          year: l.year || null,
+          make: l.make || '',
+          model: l.model || '',
+          mileage: l.mileage || null,
+          exteriorColor: l.exteriorColor || '',
+          transmission: l.transmission || 'Automatic',
+        });
         this.uploadedImages = l.images || [];
         this.platforms = l.platforms || [];
       });
@@ -217,12 +271,23 @@ export class AddListingComponent implements OnInit {
 
   buildPayload() {
     const v = this.form.value;
-    return {
+    const payload: any = {
       title: v.title, price: v.price, listingType: v.listingType,
       platforms: this.platforms, images: this.uploadedImages,
       condition: v.condition, description: v.description, location: v.location,
       campaign: v.campaignId ? { id: v.campaignId } : null,
     };
+    if (v.listingType === 'vehicle') {
+      Object.assign(payload, {
+        year: v.year || null,
+        make: v.make || null,
+        model: v.model || null,
+        mileage: v.mileage || null,
+        exteriorColor: v.exteriorColor || null,
+        transmission: v.transmission || null,
+      });
+    }
+    return payload;
   }
 
   submit() {
