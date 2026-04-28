@@ -114,6 +114,10 @@ import { ApiService } from '../../../core/services/api.service';
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
+        <p style="padding:8px 16px;color:#666;font-size:13px;">
+          Status: {{ loading ? 'loading...' : (loadError || (listings.length + ' listing(s) found')) }}
+        </p>
+
         <div *ngIf="loading" class="empty-state">
           <p>Loading listings...</p>
         </div>
